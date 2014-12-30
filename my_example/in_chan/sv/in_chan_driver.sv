@@ -48,31 +48,25 @@ endtask // reset_signals
 task in_chan_driver::drive_pkt(in_chan_pkt pkt);
 
    integer iii;
+   bit [7:0] packed_data[];
+   
 
    `uvm_info("IN_CHAN", $sformatf("Driving packet %s", pkt), UVM_MEDIUM)
    pkt.print();
 
-   
-   @(posedge vif.clock);
-   vif.packet_valid = 1'b1;
-   vif.data = {pkt.length, pkt.addr};  // Length and Address in first cycle
-   
-   @(posedge vif.clock);
-   
+   void'(pkt.pack_bytes(packed_data));
+   `uvm_info("IN_CHAN", $sformatf("Packet Packed Data = %p", packed_data), UVM_MEDIUM);
 
-   // Then all the data
-   for (iii=0; iii < pkt.length; iii++) begin
-      vif.data = pkt.data[iii];
-      @(posedge vif.clock);   
+   for (iii=0; iii< $size(packed_data); iii++) begin
+      @(posedge vif.clock);
+      vif.packet_valid = 1'b1;
+      vif.data = packed_data[iii];
    end
-
-   // And now parity
-      vif.data = pkt.parity;
-      @(posedge vif.clock);   
    
    // Finally release packet_valid
+   @(posedge vif.clock);
    vif.packet_valid = 1'b0;
-   
+  	          
 endtask // drive_pkt
 
 
