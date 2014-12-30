@@ -34,8 +34,8 @@ task in_chan_monitor::life_cycle();
    integer address;
    bit [7:0] current_data;
 
-   bit [7:0] raw_data[$] = {};
-
+   byte      unsigned raw_data [];
+   
    integer   data_count;
    
    @(negedge vif.reset);
@@ -43,17 +43,17 @@ task in_chan_monitor::life_cycle();
    forever begin
       current_pkt = in_chan_pkt::type_id::create("current_pkt");
    
-      @(posedge vif.packet_valid); // Start of a new packet
-      
-      raw_data = {};
+      @(posedge vif.packet_valid); // Start of a new packet      
       data_count = 0;
 
       // Get first byte (header info) from the bus
       current_data = vif.data;
-      raw_data.push_back(current_data);
 
       length = current_data[7:2];
       address = current_data[1:0];
+      // TODO: Add some assertions on length and address
+      raw_data = new[length+2];
+      raw_data[0] = current_data;
 
       `uvm_info("IN_CHAN", $sformatf("Read header of packet with length=%d to address=%d", length, address), UVM_MEDIUM);
 
@@ -63,7 +63,7 @@ task in_chan_monitor::life_cycle();
 	 
 	 if (vif.packet_valid === 1'b1) begin
 	    current_data = vif.data;	    
-	    raw_data.push_back(current_data);
+	    raw_data[data_count+1] = current_data; // +1 because header is already in raw_data[]
 	    `uvm_info("IN_CHAN", $sformatf("Packet Raw Data = %p", raw_data), UVM_HIGH);
 	    data_count++;	 
 	 end
@@ -71,6 +71,13 @@ task in_chan_monitor::life_cycle();
       end
       
       `uvm_info("IN_CHAN", $sformatf("Packet Raw Data = %p", raw_data), UVM_MEDIUM);
+      current_pkt.data = new[length];  // Size the array so that auto-unpack works as required
+      
+      void'(current_pkt.unpack_bytes(raw_data));
+      `uvm_info("IN_CHAN", $sformatf("Collected packet %s", current_pkt), UVM_MEDIUM);
+      current_pkt.print();
+      
+      
       
    end
 endtask // life_cycle
