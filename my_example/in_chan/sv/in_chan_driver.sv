@@ -51,11 +51,10 @@ task in_chan_driver::drive_pkt(in_chan_pkt pkt);
    bit [7:0] packed_data[];
    
 
-   `uvm_info("IN_CHAN", $sformatf("Driving packet %s", pkt), UVM_MEDIUM)
-   pkt.print();
+   `uvm_info("IN_CHAN", $sformatf("Driving packet %s\n%s", pkt, pkt.sprint()), UVM_MEDIUM)
 
    void'(pkt.pack_bytes(packed_data));
-   `uvm_info("IN_CHAN", $sformatf("Packet Packed Data = %p", packed_data), UVM_MEDIUM);
+   `uvm_info("IN_CHAN", $sformatf("Packet Packed Data = %p", packed_data), UVM_HIGH);
 
    for (iii=0; iii< $size(packed_data); iii++) begin
       @(posedge vif.clock);

@@ -39,21 +39,25 @@ class in_chan_pkt extends uvm_sequence_item;
    function bit [7:0] calc_parity ();
       int    iii;
       bit [7:0] temp;
-      `uvm_info("DEBUG", $sformatf("length=%d", length), UVM_MEDIUM);
+      `uvm_info("DEBUG", $sformatf("length=%d", length), UVM_HIGH);
       for (iii=0; iii < length; iii++) begin
 	 temp ^= data[iii];
       end
-      `uvm_info("DEBUG", $sformatf("temp=%h, parity_type=%b", temp, parity_type), UVM_MEDIUM);
+      calc_parity = temp;
+   endfunction // calc_parity
+
+   function void set_parity();
       
       if (parity_type == GOOD) begin
-	 calc_parity = temp;
+	 parity = calc_parity();
       end else begin
-	 calc_parity = ~temp;  //TODO: randomize bad parity	 
+	 parity = ~calc_parity();  //TODO: randomize bad parity	 
       end
+
    endfunction // calc_parity
 
    function void post_randomize();
-      parity = calc_parity();
+      set_parity();
    endfunction // post_randomize
    
 endclass // in_chan_pkt
