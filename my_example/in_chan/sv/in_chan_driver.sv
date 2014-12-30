@@ -52,6 +52,7 @@ task in_chan_driver::drive_pkt(in_chan_pkt pkt);
    `uvm_info("IN_CHAN", $sformatf("Driving packet %s", pkt), UVM_MEDIUM)
    pkt.print();
 
+   // A new comment to test merge
    
    @(posedge vif.clock);
    vif.packet_valid = 1'b1;
