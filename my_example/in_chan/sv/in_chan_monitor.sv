@@ -1,9 +1,6 @@
 `ifndef __IN_CHAN_MONITOR_SV
  `define __IN_CHAN_MONITOR_SV
 
-import uvm_pkg::*;
- `include "in_chan_pkt.sv"
-
 class in_chan_monitor extends uvm_monitor;
 
    `uvm_component_utils(in_chan_monitor)
@@ -24,7 +21,7 @@ class in_chan_monitor extends uvm_monitor;
    extern virtual task run_phase(uvm_phase phase);
    extern virtual task life_cycle();
    extern virtual task collect_pkt(in_chan_pkt pkt);
-   extern virtual function process_pkt(in_chan_pkt pkt);
+   extern virtual function void process_pkt(in_chan_pkt pkt);
    
 endclass // in_chan_monitor
 
@@ -100,7 +97,7 @@ function void in_chan_monitor::connect_phase(uvm_phase phase);
    
 endfunction // connect_phase
 
-function in_chan_monitor::process_pkt(in_chan_pkt pkt);
+function void in_chan_monitor::process_pkt(in_chan_pkt pkt);
 
    if (pkt.parity == pkt.calc_parity()) begin
       pkt.parity_type = GOOD;

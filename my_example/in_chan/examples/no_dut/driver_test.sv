@@ -1,3 +1,5 @@
+// Command to run: irun -uvm -access rwc -LINEDEBUG +incdir+${DRD_IN_CHAN_DIR}/sv in_chan/examples/no_dut/driver_test.sv
+
 module test();
    import uvm_pkg::*;
 

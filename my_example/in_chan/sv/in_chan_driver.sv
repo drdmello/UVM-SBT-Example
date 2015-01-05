@@ -1,9 +1,6 @@
 `ifndef __IN_CHAN_DRIVER_SV
  `define __IN_CHAN_DRIVER_SV
 
-import uvm_pkg::*;
- `include "in_chan_pkt.sv"
-
 class in_chan_driver extends uvm_driver #(in_chan_pkt);
 
    `uvm_component_utils(in_chan_driver)

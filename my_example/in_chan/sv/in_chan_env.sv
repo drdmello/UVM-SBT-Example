@@ -1,10 +1,6 @@
 `ifndef __IN_CHAN_ENV_SV
  `define __IN_CHAN_ENV_SV
 
-import uvm_pkg::*;
- `include "in_chan_agent.sv"
- `include "in_chan_seq_lib.sv"
-
 class in_chan_env extends uvm_env;
 
    `uvm_component_utils_begin(in_chan_env)

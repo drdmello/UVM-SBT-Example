@@ -1,11 +1,6 @@
 `ifndef __IN_CHAN_AGENT_SV
  `define __IN_CHAN_AGENT_SV
 
-import uvm_pkg::*;
- `include "in_chan_monitor.sv"
- `include "in_chan_driver.sv"
- `include "in_chan_sequencer.sv"
-
 class in_chan_agent extends uvm_agent;
 
    `uvm_component_utils_begin(in_chan_agent)

@@ -1,8 +1,6 @@
 `ifndef __IN_CHAN_SEQ_LIB_SV
  `define __IN_CHAN_SEQ_LIB_SV
 
- `include "in_chan_pkt.sv"
-
 class in_chan_base_seq extends uvm_sequence #(in_chan_pkt);
    `uvm_object_utils(in_chan_base_seq)
 
