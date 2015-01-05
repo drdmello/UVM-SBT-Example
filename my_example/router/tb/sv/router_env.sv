@@ -1,8 +1,6 @@
 `ifndef __ROUTER_ENV_SV
  `define __ROUTER_ENV_SV
 
-import uvm_pkg::*;
-import in_chan_pkg::*;
   
 class router_env extends uvm_env;
    `uvm_component_utils_begin(router_env)

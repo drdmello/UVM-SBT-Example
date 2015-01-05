@@ -1,7 +1,9 @@
 `ifndef __ROUTER_TESTS_SV
 `define __ROUTER_TESTS_SV
 
-`include "router_env.sv"
+import uvm_pkg::*;
+import in_chan_pkg::*;
+import router_pkg::*;
 
 
 class router_base_test extends uvm_test;
