@@ -1,14 +1,32 @@
 `ifndef __TB_SV
  `define __TB_SV
 
-interface in_chan_if(input clock, input reset);
+interface in_chan_if(
+		     input clock,
+		     input reset
+		     );
 
-   logic [7:0] data;
-   logic       packet_valid;
-   logic       err;
-   logic       suspend_data_in;
+   logic [7:0] 		   data;
+   logic 		   packet_valid;
+   logic 		   err;
+   logic 		   suspend_data_in;
+
+   modport in_chan(input packet_valid, input data, output err, output suspend_data_in);
+   
   
 endinterface // in_chan_if
+
+interface out_chan_if (
+		       input clock,
+		       input reset
+		       );
+   logic [7:0] 		     channel;
+   logic 		     vld_chan;
+   logic 		     read_enb;
+
+   modport out_chan(input read_enb, output channel, output vld_chan);
+   
+endinterface // out_chan_if
 
 
 module tb();
@@ -54,7 +72,22 @@ module tb();
 		    .clock(clock),
 		    .reset(reset)
 		    );
- 
+   
+   out_chan_if out_if0(
+		       .clock(clock),
+		       .reset(reset)
+		       );
+
+   out_chan_if out_if1(
+		       .clock(clock),
+		       .reset(reset)
+		       );
+
+   out_chan_if out_if2(
+		       .clock(clock),
+		       .reset(reset)
+		       );
+   
    initial begin
       // Register the interfaces so the class-based code can find them
       uvm_config_db#(virtual in_chan_if)::set(null, "*in_agent*", "vif", in_if);
@@ -67,22 +100,22 @@ module tb();
 	       .clock(clock),
 	       .reset(reset),
 
-	       .data(data),
-	       .packet_valid(packet_valid),
+	       .data(in_if.in_chan.data),
+	       .packet_valid(in_if.in_chan.packet_valid),
 	       .err(err),  
 	       .suspend_data_in(suspend_data_in),
 
-	       .channel0(channel0),
-	       .vld_chan_0(vld_chan_0),
-	       .read_enb_0(read_enb_0),
+	       .channel0(out_if0.out_chan.channel),
+	       .vld_chan_0(out_if0.out_chan.vld_chan),
+	       .read_enb_0(out_if0.out_chan.read_enb),
 
-	       .channel1(channel1),
-	       .vld_chan_1(vld_chan_1),
-	       .read_enb_1(read_enb_1),
+	       .channel1(out_if1.out_chan.channel),
+	       .vld_chan_1(out_if1.out_chan.vld_chan),
+	       .read_enb_1(out_if1.out_chan.read_enb),
 
-	       .channel2(channel2),
-	       .vld_chan_2(vld_chan_2),
-	       .read_enb_2(read_enb_2)
+	       .channel2(out_if2.out_chan.channel),
+	       .vld_chan_2(out_if2.out_chan.vld_chan),
+	       .read_enb_2(out_if2.out_chan.read_enb)
 
 	       );
    
