@@ -11,4 +11,5 @@ setenv DRD_EXAMPLE_HOME `pwd`
 setenv DRD_DESIGN_DIR ${DRD_EXAMPLE_HOME}/router/design
 setenv DRD_TB_DIR ${DRD_EXAMPLE_HOME}/router/tb
 setenv DRD_IN_CHAN_DIR ${DRD_EXAMPLE_HOME}/in_chan
+setenv DRD_OUT_CHAN_DIR ${DRD_EXAMPLE_HOME}/out_chan
 setenv DRD_TESTS_DIR ${DRD_TB_DIR}/tests

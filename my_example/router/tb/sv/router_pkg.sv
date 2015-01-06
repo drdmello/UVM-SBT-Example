@@ -5,6 +5,7 @@ package router_pkg;
 
    import uvm_pkg::*;
    import in_chan_pkg::*;
+   import out_chan_pkg::*;
 
  `include "router_scoreboard.sv"
  `include "router_virtual_sequencer.sv"
