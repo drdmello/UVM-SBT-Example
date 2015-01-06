@@ -26,13 +26,13 @@ endclass // router_base_vseq
 
 
 class router_counted_vseq extends router_base_vseq;
-   `uvm_object_utils(router_counted_vseq);
+   `uvm_object_utils(router_counted_vseq)
 
    in_chan_counted_seq in_seq;
 
    virtual task body();
       `uvm_do_on(in_seq, p_sequencer.in_sequencer)
-   endtask; // body
+   endtask // body
    
 endclass // router_counted_vseq
 

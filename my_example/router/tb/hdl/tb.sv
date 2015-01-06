@@ -92,8 +92,10 @@ module tb();
       // Register the interfaces so the class-based code can find them
       uvm_config_db#(virtual in_chan_if)::set(null, "*in_agent*", "vif", in_if);
       
-      uvm_config_db#(virtual out_chan_if)::set(null, "*out_agent*", "vif", out_if0);
-      
+      uvm_config_db#(virtual out_chan_if)::set(null, "*out_agent0*", "vif", out_if0);
+      uvm_config_db#(virtual out_chan_if)::set(null, "*out_agent1*", "vif", out_if1);
+      uvm_config_db#(virtual out_chan_if)::set(null, "*out_agent2*", "vif", out_if2);
+     
       // Global UVM task - starts the simulation
       run_test();
    end

@@ -5,7 +5,9 @@
 class router_env extends uvm_env;
    `uvm_component_utils_begin(router_env)
    `uvm_component_utils_end
-     
+   
+     integer num_ports = 3;
+  
    in_chan_env in_env;
    out_chan_env out_env;
    router_scoreboard scoreboard;
@@ -32,8 +34,14 @@ function void router_env::build_phase(uvm_phase phase);
 endfunction // build_phase
 
 function void router_env::connect_phase(uvm_phase phase);
+   integer iii;
+   
    in_env.in_agent.monitor.item_collected_port.connect(scoreboard.in_chan_add);
-   out_env.out_agent.monitor.item_collected_port.connect(scoreboard.out_chan_match);
+
+   for (iii=0; iii < num_ports; iii++) begin   
+      out_env.out_agents[iii].monitor.item_collected_port.connect(scoreboard.out_chan_match_ports[iii]);
+   end
+   
    if (in_env.in_agent.get_is_active() == UVM_ACTIVE)
      virtual_sequencer.in_sequencer = in_env.in_agent.sequencer;
    
