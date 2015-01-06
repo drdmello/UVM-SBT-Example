@@ -8,6 +8,7 @@ class router_env extends uvm_env;
      
    in_chan_env in_env;
    router_scoreboard scoreboard;
+   router_virtual_sequencer virtual_sequencer;
    
    function new(string name, uvm_component parent);
       super.new(name, parent);
@@ -24,11 +25,14 @@ function void router_env::build_phase(uvm_phase phase);
 
    in_env = in_chan_env::type_id::create("in_env", this);
    scoreboard = router_scoreboard::type_id::create("scoreboard", this);
+   virtual_sequencer = router_virtual_sequencer::type_id::create("virtual_sequencer", this);
    
 endfunction // build_phase
 
 function void router_env::connect_phase(uvm_phase phase);
    in_env.in_agent.monitor.item_collected_port.connect(scoreboard.in_chan_add);
+   if (in_env.in_agent.get_is_active() == UVM_ACTIVE)
+     virtual_sequencer.in_sequencer = in_env.in_agent.sequencer;
    
 endfunction // connect_phase
 
