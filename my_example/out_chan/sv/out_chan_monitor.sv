@@ -109,6 +109,8 @@ function void out_chan_monitor::process_pkt(in_chan_pkt pkt);
       pkt.parity_type = GOOD;
    end else begin
       pkt.parity_type = BAD;
+      `uvm_error("DUT_ERROR", $sformatf("Received a packet with bad parity at port %0d", port_num));
+      
    end
    `uvm_info("OUT_CHAN", $sformatf("Processed packet %s\n%s", current_pkt, current_pkt.sprint()), UVM_MEDIUM);
 
