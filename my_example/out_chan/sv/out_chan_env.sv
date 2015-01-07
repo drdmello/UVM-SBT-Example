@@ -15,6 +15,7 @@ class out_chan_env extends uvm_env;
    endfunction // new
 
    extern function void build_phase(uvm_phase phase);
+   extern function void connect_phase(uvm_phase phase);
    
 endclass // out_chan_env
 
@@ -32,6 +33,15 @@ function void out_chan_env::build_phase(uvm_phase phase);
    end
    
 endfunction // build_phase
+
+function void out_chan_env::connect_phase(uvm_phase phase);
+   // TODO: move this to a more elegant implementation using config object(s)
+   integer   iii;
+   for (iii=0; iii < num_ports; iii++) begin 
+      out_agents[iii].monitor.port_num = iii;
+   end
+   
+endfunction // connect_phase
 
 `endif
 

@@ -6,6 +6,8 @@ class out_chan_monitor extends uvm_monitor;
    `uvm_component_utils(out_chan_monitor)
    
    virtual out_chan_if vif;
+   integer port_num;
+   
    in_chan_pkt current_pkt;
 
    // Port for sending transactions to scoreboard
@@ -45,6 +47,10 @@ task out_chan_monitor::collect_pkt(in_chan_pkt pkt);
       length = current_data[7:2];
       address = current_data[1:0];
       // TODO: Add some assertions on length and address
+      if (address != port_num) begin
+	`uvm_error("DUT_ERROR", $sformatf("Received packet with address %d on port %d", address, port_num));
+      end
+   
       raw_data = new[length+2];
       raw_data[0] = current_data;
 

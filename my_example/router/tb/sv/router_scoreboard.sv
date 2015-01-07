@@ -44,7 +44,23 @@ class router_scoreboard extends uvm_scoreboard;
    endfunction // post_packet
    
    function void match_packet(in_chan_pkt pkt);
+      
+      in_chan_pkt match_candidate;
+      
       `uvm_info("ROUTER", $sformatf("Scoreboard matching out-chan packet %s\n%s", pkt, pkt.sprint()), UVM_MEDIUM);
+      if (posted_packets[pkt.addr].size() == 0) begin
+	 // Unexpected packet
+	 `uvm_error("DUT_ERROR", $sformatf("Unexpected packet received at scoreboard"));
+      end else begin
+	 match_candidate = posted_packets[pkt.addr][0];
+         `uvm_info("ROUTER", $sformatf("Scoreboard attempting match:\n Expected Packet:\n%s\nActual packet:\n%s", match_candidate.sprint(), pkt.sprint()), UVM_MEDIUM);
+	 if (match_candidate.compare(pkt) == 1) begin
+	    `uvm_info("ROUTER", $sformatf("Scoreboard successfully matched packet\n%s", pkt), UVM_HIGH);
+	    posted_packets[pkt.addr].delete(0);  // remove it from scoreboard
+	 end else begin
+	    `uvm_error("DUT_ERROR", $sformatf("Scoreboard match failed for packet \s%s", pkt));
+	 end	 
+      end
    endfunction // match_packet
 
    virtual function void write_in_chan(in_chan_pkt pkt);
