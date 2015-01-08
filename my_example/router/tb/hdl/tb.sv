@@ -11,10 +11,16 @@ interface in_chan_if(
    logic 		   err;
    logic 		   suspend_data_in;
    
-   clocking cb @(posedge clock);
-      inout 		   err, suspend_data_in;
-      inout 		   packet_valid, data;
-   endclocking // cb
+   clocking mon_cb @(posedge clock);
+      input 		   err, suspend_data_in;
+      input 		   packet_valid, data;
+   endclocking // mon_cb
+   
+   clocking driver_cb @(posedge clock);
+      input 		   err, suspend_data_in;
+      output 		   packet_valid, data;
+   endclocking // driver_cb
+   
    
    modport in_chan(input packet_valid, input data, output err, output suspend_data_in);  // For connection to DUT
    
@@ -29,10 +35,15 @@ interface out_chan_if (
    logic 		     vld_chan;
    logic 		     read_enb;
 
-   clocking cb @(posedge clock);
+   clocking mon_cb @(posedge clock);
       input 		     channel, vld_chan;
-      inout 		     read_enb;
-   endclocking // cb
+      input 		     read_enb;
+   endclocking // mon_cb
+   
+   clocking driver_cb @(posedge clock);
+      input 		     channel, vld_chan;
+      output 		     read_enb;
+   endclocking // driver_cb
 
    modport out_chan(input read_enb, output channel, output vld_chan);  // For connection to DUT   
    

@@ -54,14 +54,14 @@ task in_chan_driver::drive_pkt(in_chan_pkt pkt);
    `uvm_info("IN_CHAN", $sformatf("Packet Packed Data = %p", packed_data), UVM_HIGH);
 
    for (iii=0; iii< $size(packed_data); iii++) begin
-      @(posedge vif.clock);
-      vif.packet_valid = 1'b1;
-      vif.data = packed_data[iii];
+      @(vif.driver_cb);
+      vif.driver_cb.packet_valid <= 1'b1;
+      vif.driver_cb.data <= packed_data[iii];
    end
    
    // Finally release packet_valid
-   @(posedge vif.clock);
-   vif.packet_valid = 1'b0;
+   @(vif.driver_cb);
+   vif.packet_valid <= 1'b0;
   	          
 endtask // drive_pkt
 
