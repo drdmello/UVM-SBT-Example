@@ -6,7 +6,9 @@ class router_env extends uvm_env;
    `uvm_component_utils_begin(router_env)
    `uvm_component_utils_end
    
-     integer num_ports = 3;
+   integer num_ports = 3;
+
+   virtual tb_general_if vif;
   
    in_chan_env in_env;
    out_chan_env out_env;
@@ -34,7 +36,13 @@ function void router_env::build_phase(uvm_phase phase);
 endfunction // build_phase
 
 function void router_env::connect_phase(uvm_phase phase);
+   
    integer iii;
+
+   super.connect_phase(phase);
+   
+   if(!uvm_config_db#(virtual tb_general_if)::get(this, get_full_name(), "vif", vif))
+     `uvm_error("NOVIF", $sformatf("Unable to get Virtual Interface for %s, vif", get_full_name()));
    
    in_env.in_agent.monitor.item_collected_port.connect(scoreboard.in_chan_add);
 

@@ -20,7 +20,17 @@ class router_base_test extends uvm_test;
       super.build_phase(phase);
       env = router_env::type_id::create("env", this);
    endfunction
-   
+
+   // Add some drain time after all objections are dropped
+   // TODO: Determine why this was not working when placed in the router_env class
+   virtual task all_dropped (uvm_objection objection, uvm_object source_obj, string description, int count);
+      
+      if (objection == uvm_test_done) begin
+	 repeat (10) @(env.vif.cb);
+      end
+      
+   endtask // all_dropped
+
 endclass // router_base_test
 
 class simple_test extends router_base_test;

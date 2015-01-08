@@ -38,6 +38,16 @@ interface out_chan_if (
    
 endinterface // out_chan_if
 
+// Interface for global things like end-of-test 
+interface tb_general_if (
+		       input clock,
+		       input reset
+			 );
+   clocking cb @(posedge clock);
+   endclocking // cb
+   
+endinterface // tb_general_if
+
 
 module tb();
    
@@ -76,7 +86,11 @@ module tb();
       
    end // initial begin
    
-
+   tb_general_if tb_if (
+			.clock(clock),
+			.reset(reset)
+			);
+   
 
    in_chan_if in_if(
 		    .clock(clock),
@@ -100,6 +114,8 @@ module tb();
    
    initial begin
       // Register the interfaces so the class-based code can find them
+      uvm_config_db#(virtual tb_general_if)::set(null, "*.env", "vif", tb_if);
+      
       uvm_config_db#(virtual in_chan_if)::set(null, "*in_agent*", "vif", in_if);
       
       uvm_config_db#(virtual out_chan_if)::set(null, "*out_agent0*", "vif", out_if0);
