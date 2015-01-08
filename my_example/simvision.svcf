@@ -1,4 +1,4 @@
-# SimVision Command Script (Mon Dec 29 10:54:29 PST 2014)
+# SimVision Command Script (Thu Jan 08 10:38:22 PST 2015)
 #
 # Version 14.10.s012
 #
@@ -11,11 +11,20 @@
 #
 # Preferences
 #
+preferences set toolbar-Standard-WatchWindow {
+  usual
+  shown 0
+}
 preferences set plugin-enable-svdatabrowser-new 1
+preferences set toolbar-Windows-WatchWindow {
+  usual
+  shown 0
+}
 preferences set toolbar-Standard-Console {
   usual
   position -pos 1
 }
+preferences set watchwindow-dont-show-probe-warning 1
 preferences set toolbar-Search-Console {
   usual
   position -pos 2
@@ -26,7 +35,16 @@ preferences set toolbar-Standard-WaveWindow {
 }
 preferences set plugin-enable-groupscope 0
 preferences set plugin-enable-interleaveandcompare 0
+preferences set toolbar-SimControl-WatchWindow {
+  usual
+  shown 0
+}
+preferences set watchwindow-always-probe-added 1
 preferences set whats-new-dont-show-at-startup 1
+preferences set toolbar-TimeSearch-WatchWindow {
+  usual
+  shown 0
+}
 
 #
 # Mnemonic Maps
@@ -46,17 +64,17 @@ if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x500+261+
 }
 window target "Design Browser 1" on
 browser using {Design Browser 1}
-browser set -scope [subst  {[format {tb.in_if}]} ]
+browser set -scope [subst  {[format {tb.out_if2}]} ]
 browser set \
     -signalsort name
-browser yview see [subst  {[format {tb.in_if}]} ]
+browser yview see [subst  {[format {tb.out_if2}]} ]
 browser timecontrol set -lock 0
 
 #
 # Waveform windows
 #
-if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1010x600+834+392}] != ""} {
-    window geometry "Waveform 1" 1010x600+834+392
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1010x600+503+340}] != ""} {
+    window geometry "Waveform 1" 1010x600+503+340
 }
 window target "Waveform 1" on
 waveform using {Waveform 1}
@@ -70,35 +88,98 @@ waveform set \
 waveform baseline set -time 0
 
 set id [waveform add -signals [subst  {
-	{[format {tb.in_if.clock}]}
+	{[format {tb.dut.reset}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.in_if.data[7:0]}]}
+	{[format {tb.dut.clock}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.in_if.err}]}
+	{[format {tb.dut.packet_valid}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.in_if.packet_valid}]}
+	{[format {tb.dut.data[7:0]}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.in_if.reset}]}
+	{[format {tb.dut.err}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.in_if.suspend_data_in}]}
+	{[format {tb.dut.suspend_data_in}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.read_enb_0}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.vld_chan_0}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.channel0[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.read_enb_1}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.vld_chan_1}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.channel1[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.read_enb_2}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.vld_chan_2}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.channel2[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.data_count}]}
 	} ]]
 
-waveform xview limits 0 2000ns
+waveform xview limits 0 130ns
 
 #
 # Waveform Window Links
 #
 
 #
+# Source Browser windows
+#
+if {[catch {window new SrcBrowser -name "Source Browser 1" -geometry 700x525+244+323}] != ""} {
+    window geometry "Source Browser 1" 700x525+244+323
+}
+window target "Source Browser 1" on
+srcbrowser using {Source Browser 1}
+srcbrowser set \
+    -primarycursor TimeA \
+    -units ns \
+    -radix default \
+    -showstrength 0 \
+    -showcallstack 0 \
+    -displayvalues 0
+
+srcbrowser show -scope worklib.out_chan_pkg::out_chan_monitor.collect_pkt -file /usr2/ddmello/work/uvm/my_example/out_chan/sv/out_chan_monitor.sv -line 1
+
+srcbrowser sidebar visibility partial
+
+#
+# Watch Window windows
+#
+if {[catch {window new WatchWindow -name "Watch Window 1" -geometry 511x500+1100+432}] != ""} {
+    window geometry "Watch Window 1" 511x500+1100+432
+}
+window target "Watch Window 1" on
+watchwindow using "Watch Window 1"
+watchwindow add -signals [subst  {{[format {worklib.out_chan_pkg::out_chan_monitor.current_pkt}]} {[format {worklib.out_chan_pkg::out_chan_monitor.item_collected_port}]} {[format {worklib.out_chan_pkg::out_chan_monitor.port_num}]} {[format {worklib.out_chan_pkg::out_chan_monitor.type_id}]} {[format {worklib.out_chan_pkg::out_chan_monitor.type_name}]} {[format {worklib.out_chan_pkg::out_chan_monitor.vif}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.data_count}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.current_data}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.length}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.address}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.raw_data}]}} ]
+watchwindow timecontrol set -lock 0
+watchwindow set  -showassertions 1 -showerrorsignals 1 -showfibers 1 -showinouts 1 -showinputs 1 -showinternals 1 -showlive 1 -showoutputs 1
+
+
+#
 # Console windows
 #
 console set -windowname Console
-window geometry Console 730x250+261+564
+window geometry Console 951x355+40+564
 
 #
 # Layout selection

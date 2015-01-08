@@ -38,11 +38,11 @@ task out_chan_monitor::collect_pkt(in_chan_pkt pkt);
    
    integer   data_count;
 
-      @(posedge vif.vld_chan); // Start of a new packet      
+      @(posedge vif.cb.vld_chan); // Start of a new packet      
       data_count = 0;
 
       // Get first byte (header info) from the bus
-      current_data = vif.channel;
+      current_data = vif.cb.channel;
 
       length = current_data[7:2];
       address = current_data[1:0];
@@ -58,10 +58,10 @@ task out_chan_monitor::collect_pkt(in_chan_pkt pkt);
 
       // Now get (length+1) more bytes (data[length] + parity)
       while (data_count <= length) begin
-	 @(posedge vif.clock);
+	 @(vif.cb);
 	 
-	 if (vif.vld_chan === 1'b1) begin
-	    current_data = vif.channel;	    
+	 if (vif.cb.vld_chan === 1'b1) begin
+	    current_data = vif.cb.channel;	    
 	    raw_data[data_count+1] = current_data; // +1 because header is already in raw_data[]
 	    `uvm_info("OUT_CHAN", $sformatf("Packet Raw Data = %p", raw_data), UVM_HIGH);
 	    data_count++;	 

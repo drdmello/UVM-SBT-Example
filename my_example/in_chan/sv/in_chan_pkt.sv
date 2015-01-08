@@ -31,6 +31,7 @@ class in_chan_pkt extends uvm_sequence_item;
    constraint c_defaults {
       length < 10;
       addr <= 2;
+      parity_type == GOOD;
    }
 
    function new (string name="in_chan_pkt");

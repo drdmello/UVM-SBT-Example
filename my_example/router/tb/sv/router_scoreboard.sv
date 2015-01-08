@@ -34,7 +34,7 @@ class router_scoreboard extends uvm_scoreboard;
       
    endfunction // new
 
-   function void build_phase (uvm_phase phase);
+   virtual function void build_phase (uvm_phase phase);
       posted_packets = new[num_ports];
    endfunction // build_phase
 
@@ -55,7 +55,7 @@ class router_scoreboard extends uvm_scoreboard;
 	 match_candidate = posted_packets[pkt.addr][0];
          `uvm_info("ROUTER", $sformatf("Scoreboard attempting match:\n Expected Packet:\n%s\nActual packet:\n%s", match_candidate.sprint(), pkt.sprint()), UVM_MEDIUM);
 	 if (match_candidate.compare(pkt) == 1) begin
-	    `uvm_info("ROUTER", $sformatf("Scoreboard successfully matched packet\n%s", pkt), UVM_HIGH);
+	    `uvm_info("ROUTER", $sformatf("Scoreboard successfully matched packet\n%s", pkt), UVM_MEDIUM);
 	    posted_packets[pkt.addr].delete(0);  // remove it from scoreboard
 	 end else begin
 	    `uvm_error("DUT_ERROR", $sformatf("Scoreboard match failed for packet \s%s", pkt));
@@ -73,6 +73,24 @@ class router_scoreboard extends uvm_scoreboard;
       match_packet(pkt);
    endfunction // write_out_chan
 
+   virtual function void check_phase (uvm_phase phase);
+
+      integer num_skipped_packets = 0;
+      
+      // Ensure that no expected packets remain unmatched in the scoreboard queues      
+      foreach (posted_packets[iii]) begin
+	 num_skipped_packets = posted_packets[iii].size();
+	 if (num_skipped_packets != 0) begin
+	    // Some packets were skipped
+	    `uvm_error("DUT_ERROR", $sformatf("%0d packets were skipped at port %0d", num_skipped_packets, iii));
+	 end else begin
+	    // No expected packets were skipped
+	    `uvm_info("ROUTER", $sformatf("No expected packets were skipped at port %0d", iii), UVM_MEDIUM);
+	 end
+      end
+      
+   endfunction // check_phase
+   
  
 endclass // router_scoreboard
 
