@@ -38,6 +38,13 @@ class in_chan_monitor extends uvm_monitor;
       }
 
       PKT_ADDRxLENGTH : cross PKT_ADDR, PKT_LENGTH;  
+
+      PKT_DELAY : coverpoint current_pkt.inter_packet_delay {
+	 bins BACK_TO_BACK = {0};
+	 bins SHORT = {[1:3]};
+	 bins LONG = {[4:6]};
+	 bins MAX = {10};
+      }
 	
    endgroup // in_chan_pkt_cg
 
