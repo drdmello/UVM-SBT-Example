@@ -4,24 +4,56 @@
 class in_chan_monitor extends uvm_monitor;
 
    `uvm_component_utils(in_chan_monitor)
+
+   bit enable_coverage = 1;
    
    virtual in_chan_if vif;
    in_chan_pkt current_pkt;
+   
 
    // Port for sending transactions to scoreboard
-   uvm_analysis_port #(in_chan_pkt) item_collected_port;
-   
-   
-   function new (string name, uvm_component parent);
-      super.new(name, parent);
-      item_collected_port = new("item_collected_port", this);
-   endfunction // new
+   uvm_analysis_port #(in_chan_pkt) item_collected_port;   
 
    extern virtual function void connect_phase(uvm_phase phase);
    extern virtual task run_phase(uvm_phase phase);
    extern virtual task life_cycle();
    extern virtual task collect_pkt(in_chan_pkt pkt);
    extern virtual function void process_pkt(in_chan_pkt pkt);
+
+   // Some basic stimulus coverage
+   covergroup in_chan_pkt_cg;
+      PKT_ADDR : coverpoint current_pkt.addr {
+	 bins PORT_0 = {0};
+	 bins PORT_1 = {1};
+	 bins PORT_2 = {2};
+	 bins ILLEGAL = {3};
+      }
+
+      PKT_LENGTH : coverpoint current_pkt.length {
+	 bins EMPTY = {0};
+	 bins SHORT = {[1:16]};
+	 bins MEDIUM = {[17:48]};
+	 bins LONG = {[49:62]};
+	 bins MAX = {63};
+      }
+
+      PKT_ADDRxLENGTH : cross PKT_ADDR, PKT_LENGTH;  
+	
+   endgroup // in_chan_pkt_cg
+
+   function new (string name, uvm_component parent);
+      super.new(name, parent);
+      item_collected_port = new("item_collected_port", this);
+
+      if (enable_coverage) begin
+	 `uvm_info("IN_CHAN", $sformatf("Enabling Coverage collection for in-chan monitor"), UVM_MEDIUM);
+	 in_chan_pkt_cg = new();
+	 //in_chan_pkt_cg.set_inst_name({get_full_name(), ".in_chan_pkt_cg"});
+      end else begin
+	 `uvm_info("IN_CHAN", $sformatf("Coverage collection for in-chan monitor is not enabled"), UVM_MEDIUM);
+      end
+      
+   endfunction // new
    
 endclass // in_chan_monitor
 
@@ -106,6 +138,10 @@ function void in_chan_monitor::process_pkt(in_chan_pkt pkt);
    end
    `uvm_info("IN_CHAN", $sformatf("Processed packet %s\n%s", current_pkt, current_pkt.sprint()), UVM_MEDIUM);
 
+   if (enable_coverage) begin
+      in_chan_pkt_cg.sample();
+   end
+   
    item_collected_port.write(pkt);
 endfunction
 
