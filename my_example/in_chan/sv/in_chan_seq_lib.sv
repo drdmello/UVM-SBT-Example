@@ -6,6 +6,7 @@ class in_chan_base_seq extends uvm_sequence #(in_chan_pkt);
 
    function new (string name = "in_chan_base_seq");
      super.new(name);
+     set_response_queue_error_report_disabled(1);
    endfunction // new
 
    virtual task body();
@@ -21,7 +22,7 @@ class in_chan_counted_seq extends in_chan_base_seq;
    rand integer count;
    constraint c_default {
       count >= 1;
-      count <= 20;
+      count <= 50;
    }
 
    function new (string name = "in_chan_counted_seq");
