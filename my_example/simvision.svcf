@@ -1,4 +1,4 @@
-# SimVision Command Script (Thu Jan 08 10:38:22 PST 2015)
+# SimVision Command Script (Thu Jan 15 10:30:01 PST 2015)
 #
 # Version 14.10.s012
 #
@@ -47,6 +47,54 @@ preferences set toolbar-TimeSearch-WatchWindow {
 }
 
 #
+# Groups
+#
+catch {group new -name {DUT I/O} -overlay 0}
+catch {group new -name In-stage -overlay 0}
+
+group using {DUT I/O}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {[format {tb.dut.reset}]} ] \
+    [subst  {[format {tb.dut.clock}]} ] \
+    [subst  {[format {tb.dut.packet_valid}]} ] \
+    [subst  {[format {tb.dut.data[7:0]}]} ] \
+    [subst  {[format {tb.dut.err}]} ] \
+    [subst  {[format {tb.dut.suspend_data_in}]} ] \
+    [subst  {[format {tb.dut.read_enb_0}]} ] \
+    [subst  {[format {tb.dut.vld_chan_0}]} ] \
+    [subst  {[format {tb.dut.channel0[7:0]}]} ] \
+    [subst  {[format {tb.dut.read_enb_1}]} ] \
+    [subst  {[format {tb.dut.vld_chan_1}]} ] \
+    [subst  {[format {tb.dut.channel1[7:0]}]} ] \
+    [subst  {[format {tb.dut.read_enb_2}]} ] \
+    [subst  {[format {tb.dut.vld_chan_2}]} ] \
+    [subst  {[format {tb.dut.channel2[7:0]}]} ] \
+    [subst  {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.data_count}]} ]
+
+group using In-stage
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+
+group insert \
+    [subst  {[format {tb.dut.in_stage.reset}]} ] \
+    [subst  {[format {tb.dut.in_stage.clock}]} ] \
+    [subst  {[format {tb.dut.in_stage.packet_valid}]} ] \
+    [subst  {[format {tb.dut.in_stage.data[7:0]}]} ] \
+    [subst  {[format {tb.dut.in_stage.err}]} ] \
+    [subst  {[format {tb.dut.in_stage.suspend_data_in}]} ] \
+    [subst  {[format {tb.dut.in_stage.data_out[7:0]}]} ] \
+    [subst  {[format {tb.dut.in_stage.packet_valid_0}]} ] \
+    [subst  {[format {tb.dut.in_stage.packet_valid_1}]} ] \
+    [subst  {[format {tb.dut.in_stage.packet_valid_2}]} ] \
+    [subst  {[format {tb.dut.in_stage.current_state[2:0]}]} ] \
+    [subst  {[format {tb.dut.in_stage.data_countdown[5:0]}]} ]
+
+#
 # Mnemonic Maps
 #
 mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
@@ -54,6 +102,10 @@ mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepri
 mmap new -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
 {%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
 {%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+mmap new -reuse -name INPUT_FSM -radix %x -contents {{%b=000 -bgcolor orange -label IDLE -linecolor yellow -shape bus}
+{%b=001 -bgcolor #0099ff -font -*-courier-medium-r-normal--12-* -label DATA -linecolor white -shape EVENT}
+{%b=??? -bgcolor red -label ERROR -linecolor white -shape EVENT}
 {%x=* -label %x -linecolor gray -shape bus}}
 
 #
@@ -64,17 +116,17 @@ if {[catch {window new WatchList -name "Design Browser 1" -geometry 730x500+261+
 }
 window target "Design Browser 1" on
 browser using {Design Browser 1}
-browser set -scope [subst  {[format {tb.out_if2}]} ]
+browser set -scope [subst  {[format {tb.dut.in_stage}]} ]
 browser set \
     -signalsort name
-browser yview see [subst  {[format {tb.out_if2}]} ]
+browser yview see [subst  {[format {tb.dut.in_stage}]} ]
 browser timecontrol set -lock 0
 
 #
 # Waveform windows
 #
-if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1010x600+503+340}] != ""} {
-    window geometry "Waveform 1" 1010x600+503+340
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1429x809+194+136}] != ""} {
+    window geometry "Waveform 1" 1429x809+194+136
 }
 window target "Waveform 1" on
 waveform using {Waveform 1}
@@ -87,56 +139,75 @@ waveform set \
     -valuewidth 75
 waveform baseline set -time 0
 
+
+set groupId0 [waveform add -groups {{DUT I/O}}]
+
+
+set groupId0 [waveform add -groups In-stage]
+set gpGlist0 [waveform hierarchy contents $groupId0]
+set gpID0 [lindex $gpGlist0 0]
+foreach {name attrs} [subst  {
+    {[format {tb.dut.in_stage.reset}]} {}
+    {[format {tb.dut.in_stage.clock}]} {}
+    {[format {tb.dut.in_stage.packet_valid}]} {}
+    {[format {tb.dut.in_stage.data[7:0]}]} {}
+    {[format {tb.dut.in_stage.err}]} {}
+    {[format {tb.dut.in_stage.suspend_data_in}]} {}
+    {[format {tb.dut.in_stage.data_out[7:0]}]} {}
+    {[format {tb.dut.in_stage.packet_valid_0}]} {}
+    {[format {tb.dut.in_stage.packet_valid_1}]} {}
+    {[format {tb.dut.in_stage.packet_valid_2}]} {}
+    {[format {tb.dut.in_stage.current_state[2:0]}]} {-radix INPUT_FSM}
+    {[format {tb.dut.in_stage.data_countdown[5:0]}]} {}
+}] childcmds {
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+} {
+    set expected [ join [waveform signals -format path $gpID0] ]
+    if {[string equal $name $expected] || $name == "cdivider"} {
+        if {$attrs != ""} {
+            eval waveform format $gpID0 $attrs
+        }
+        if { $childcmds != ""} {
+            eval $childcmds
+        }
+    }
+    set gpGlist0 [lrange $gpGlist0 1 end]
+    set gpID0 [lindex $gpGlist0 0]
+}
+waveform hierarchy collapse $groupId0
+
 set id [waveform add -signals [subst  {
-	{[format {tb.dut.reset}]}
+	{[format {tb.dut.in_stage.start_of_packet}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.dut.clock}]}
+	{[format {tb.dut.in_stage.end_of_packet}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.dut.packet_valid}]}
+	{[format {tb.dut.in_stage.end_of_packet_d}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.dut.data[7:0]}]}
+	{[format {tb.dut.in_stage.current_state[2:0]}]}
+	} ]]
+waveform format $id -radix INPUT_FSM
+set id [waveform add -signals [subst  {
+	{[format {tb.dut.in_stage.pkt_address[1:0]}]}
 	} ]]
 set id [waveform add -signals [subst  {
-	{[format {tb.dut.err}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.suspend_data_in}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.read_enb_0}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.vld_chan_0}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.channel0[7:0]}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.read_enb_1}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.vld_chan_1}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.channel1[7:0]}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.read_enb_2}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.vld_chan_2}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {tb.dut.channel2[7:0]}]}
-	} ]]
-set id [waveform add -signals [subst  {
-	{[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.data_count}]}
+	{[format {tb.dut.in_stage.pkt_length[5:0]}]}
 	} ]]
 
-waveform xview limits 0 130ns
+waveform xview limits 0 429ns
 
 #
 # Waveform Window Links
@@ -158,7 +229,7 @@ srcbrowser set \
     -showcallstack 0 \
     -displayvalues 0
 
-srcbrowser show -scope worklib.out_chan_pkg::out_chan_monitor.collect_pkt -file /usr2/ddmello/work/uvm/my_example/out_chan/sv/out_chan_monitor.sv -line 1
+srcbrowser show -scope worklib.uvm_pkg::uvm_root.run_test -file /pkg/cadence/general/incisiv14.10.012/tools/methodology/UVM/CDNS-1.1d/sv/src/base/uvm_root.svh -line 1
 
 srcbrowser sidebar visibility partial
 
@@ -170,7 +241,7 @@ if {[catch {window new WatchWindow -name "Watch Window 1" -geometry 511x500+1100
 }
 window target "Watch Window 1" on
 watchwindow using "Watch Window 1"
-watchwindow add -signals [subst  {{[format {worklib.out_chan_pkg::out_chan_monitor.current_pkt}]} {[format {worklib.out_chan_pkg::out_chan_monitor.item_collected_port}]} {[format {worklib.out_chan_pkg::out_chan_monitor.port_num}]} {[format {worklib.out_chan_pkg::out_chan_monitor.type_id}]} {[format {worklib.out_chan_pkg::out_chan_monitor.type_name}]} {[format {worklib.out_chan_pkg::out_chan_monitor.vif}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.data_count}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.current_data}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.length}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.address}]} {[format {worklib.out_chan_pkg::out_chan_monitor.collect_pkt.raw_data}]}} ]
+watchwindow add -signals [subst  {{[format {worklib.out_chan_pkg::out_chan_monitor.current_pkt}]} {[format {worklib.out_chan_pkg::out_chan_monitor.item_collected_port}]} {[format {worklib.out_chan_pkg::out_chan_monitor.port_num}]} {[format {worklib.out_chan_pkg::out_chan_monitor.type_id}]} {[format {worklib.out_chan_pkg::out_chan_monitor.type_name}]} {[format {worklib.out_chan_pkg::out_chan_monitor.vif}]}} ]
 watchwindow timecontrol set -lock 0
 watchwindow set  -showassertions 1 -showerrorsignals 1 -showfibers 1 -showinouts 1 -showinputs 1 -showinternals 1 -showlive 1 -showoutputs 1
 
@@ -179,7 +250,7 @@ watchwindow set  -showassertions 1 -showerrorsignals 1 -showfibers 1 -showinouts
 # Console windows
 #
 console set -windowname Console
-window geometry Console 951x355+40+564
+window geometry Console 1250x355+40+564
 
 #
 # Layout selection
