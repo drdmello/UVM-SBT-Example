@@ -75,7 +75,10 @@ task in_chan_monitor::collect_pkt(in_chan_pkt pkt);
    
    integer   data_count;
 
-      @(posedge vif.mon_cb.packet_valid); // Start of a new packet      
+      // Sync to start of a new packet      
+      while (vif.mon_cb.packet_valid != 1'b1)
+	@(vif.mon_cb);
+   
       data_count = 0;
 
       // Get first byte (header info) from the bus
@@ -107,6 +110,9 @@ task in_chan_monitor::collect_pkt(in_chan_pkt pkt);
       
       void'(current_pkt.unpack_bytes(raw_data));
       `uvm_info("IN_CHAN", $sformatf("Collected packet %s\n%s", current_pkt, current_pkt.sprint()), UVM_HIGH);
+
+   @(vif.mon_cb);
+   
    
 endtask // collect_pkt
 

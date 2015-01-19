@@ -99,6 +99,10 @@ module input_stage (
       end else begin
 	 data_out <= data;
 	 if (start_of_packet) begin
+	    // Clear all first, then set immediately to handle back-to-back packets
+	    packet_valid_0 <= 0;
+	    packet_valid_1 <= 0;
+	    packet_valid_2 <= 0;
 	    case (pkt_address)
 	      2'b00 : packet_valid_0 <= 1;
 	      2'b01 : packet_valid_1 <= 1;

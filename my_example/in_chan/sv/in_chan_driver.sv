@@ -56,7 +56,9 @@ task in_chan_driver::drive_pkt(in_chan_pkt pkt);
    repeat (pkt.inter_packet_delay) @(vif.driver_cb);
    
    for (iii=0; iii< $size(packed_data); iii++) begin
-      @(vif.driver_cb);
+      if (iii != 0)
+	@(vif.driver_cb);
+      
       vif.driver_cb.packet_valid <= 1'b1;
       vif.driver_cb.data <= packed_data[iii];
    end
